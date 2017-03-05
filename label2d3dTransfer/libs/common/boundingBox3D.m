@@ -1,0 +1,74 @@
+function box = boundingBox3D(points, scl)
+%BOUNDINGBOX Bounding box of a set of points
+%
+%   BOX = boundingBox(POINTS)
+%   Returns the bounding box of the set of points POINTS. POINTS can be
+%   either a N-by-2 or N-by-3 array. The result BOX is a 1-by-4 or 1-by-6
+%   array, containing:
+%   [XMIN XMAX YMIN YMAX] (2D point sets)
+%   [XMIN XMAX YMIN YMAX ZMIN ZMAX] (3D point sets)
+%
+%   Example
+%   % Draw the bounding box of a set of random points
+%     points = rand(30, 2);
+%     figure; hold on;
+%     drawPoint(points, '.');
+%     box = boundingBox(points);
+%     drawBox(box, 'r');
+%
+%   % Draw bounding box of a cubeoctehedron
+%     [v e f] = createCubeOctahedron;
+%     box3d = boundingBox(v);
+%     figure; hold on;
+%     drawMesh(v, f);
+%     drawBox3d(box3d);
+%     set(gcf, 'renderer', 'opengl')
+%     axis([-2 2 -2 2 -2 2]);
+%     view(3)
+%     
+%   See also
+%   polygonBounds, drawBox
+%
+% ------
+% Author: David Legland
+% e-mail: david.legland@grignon.inra.fr
+% Created: 2011-04-01,    using Matlab 7.9.0.529 (R2009b)
+% Copyright 2011 INRA - Cepia Software Platform.
+
+%   HISTORY
+%   2011-04-08 add example
+%   2011-12-09 rename to boundingBox
+if size(points,1)==3
+    points = points';
+end
+
+if nargin >1
+    A = [0 0 0];
+    B = [1 0 0];
+    C = [0 1 0];
+    D = [0 0 1];
+    E = [0 1 1];
+    F = [1 0 1];
+    G = [1 1 0];
+    H = [1 1 1];
+    bBox = [A;B;C;D;E;F;G;H]*scl;
+    bBox = bBox - repmat(mean(bBox), [8, 1]);
+    bBox = repmat(points, [8, 1]) - bBox;
+    plotCube(bBox);
+    return;
+end
+
+
+% compute extreme x and y values
+xmin = min(points(:,1));
+xmax = max(points(:,1));
+ymin = min(points(:,2));
+ymax = max(points(:,2));
+box = [xmin xmax ymin ymax];
+
+% process case of 3D points
+if size(points, 2) > 2
+    zmin = min(points(:,3));
+    zmax = max(points(:,3));
+    box = [xmin xmax ymin ymax zmin zmax];
+end
